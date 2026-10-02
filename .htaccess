@@ -1,0 +1,25 @@
+# ----------------------------------------------------------------------
+# Root Security & Directory Protection (Apache / Laragon)
+# ----------------------------------------------------------------------
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Prevent direct access to hidden dotfiles (.env, .git, etc.)
+    RewriteRule (^\.|/\.) - [F]
+
+    # Redirect all public requests to /public folder
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ public/$1 [L,QSA]
+</IfModule>
+
+# Deny direct access to sensitive configuration, codebase, and log files
+<FilesMatch "^\.|\.(env|json|lock|log|md|xml|yml|yaml|php|sh|bat)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
