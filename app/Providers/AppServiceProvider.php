@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Listeners\LogAuthenticationEvents;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -37,5 +39,8 @@ class AppServiceProvider extends ServiceProvider
                 ? $rule->letters()->mixedCase()->numbers()->symbols()->uncompromised()
                 : $rule->letters()->numbers();
         });
+
+        // Register authentication audit logging subscriber
+        Event::subscribe(LogAuthenticationEvents::class);
     }
 }
