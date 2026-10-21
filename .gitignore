@@ -19,6 +19,7 @@ yarn-error.log
 /.fleet
 /.idea
 /.nova
+/.antigravity
 /.vscode
 /.zed
 /nogit

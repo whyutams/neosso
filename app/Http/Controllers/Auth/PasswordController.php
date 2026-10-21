@@ -11,9 +11,6 @@ use Illuminate\Validation\Rules\Password;
 
 class PasswordController extends Controller
 {
-    /**
-     * Update the user's password and invalidate sessions on all other devices.
-     */
     public function update(Request $request): RedirectResponse
     {
         $validated = $request->validate([
@@ -25,7 +22,6 @@ class PasswordController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        // Invalidate all other active sessions across other devices
         Auth::logoutOtherDevices($validated['password']);
 
         return back();
