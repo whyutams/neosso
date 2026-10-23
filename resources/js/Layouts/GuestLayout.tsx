@@ -29,17 +29,12 @@ export default function GuestLayout({ children, showHomeButton = true }: GuestLa
                     />
                 </div>
 
-                <div className="relative z-20 flex items-center gap-3.5">
+                <div className="relative z-20 flex items-center">
                     <img
-                        src="/img/ung-logo.png"
+                        src="/img/logo-web.png"
                         alt="Logo Universitas Negeri Gorontalo"
-                        className="h-14 w-14 shrink-0 object-contain drop-shadow"
+                        className="h-14 w-auto object-contain drop-shadow"
                     />
-                    <div>
-                        <span className="text-2xl tracking-normal font-bold text-white uppercase">
-                            Universitas Negeri Gorontalo
-                        </span>
-                    </div>
                 </div>
 
                 <div className="relative z-20 max-w-xl py-10 my-auto">

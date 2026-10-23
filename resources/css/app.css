@@ -6,3 +6,18 @@
     background-color: #7B1113;
     color: #ffffff;
 }
+
+#nprogress .bar {
+    background: #7B1113 !important;
+    height: 2px !important;
+    z-index: 99999 !important;
+}
+
+#nprogress .peg {
+    box-shadow: 0 0 10px #7B1113, 0 0 5px #7B1113 !important;
+}
+
+#nprogress .spinner {
+    display: none !important;
+}
+
