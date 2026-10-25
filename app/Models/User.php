@@ -81,6 +81,12 @@ class User extends Authenticatable
         return $this->role === 'admin';
     }
 
+    // Role admin_prodi sudah dihapus (selalu return false untuk keamanan)
+    public function isAdminProdi(): bool
+    {
+        return false;
+    }
+
     // Cek hak akses admin
     public function hasAdminAccess(): bool
     {
@@ -100,6 +106,24 @@ class User extends Authenticatable
             return true;
         }
 
-        return $this->isAdmin() && $this->jurusan_id === $jurusanId;
+        if ($this->isAdmin() && $this->jurusan_id === $jurusanId) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // Cek hak kelola program studi
+    public function canManageProdi(?int $prodiId, ?int $prodiJurusanId = null): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        if ($this->isAdmin() && $prodiJurusanId !== null && $this->jurusan_id === $prodiJurusanId) {
+            return true;
+        }
+
+        return false;
     }
 }

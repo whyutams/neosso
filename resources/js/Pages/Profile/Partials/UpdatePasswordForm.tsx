@@ -28,6 +28,12 @@ export default function UpdatePasswordForm({
         password_confirmation: '',
     });
 
+    const isFormValid =
+        data.current_password.length > 0 &&
+        data.password.length >= 8 &&
+        data.password_confirmation.length > 0 &&
+        data.password === data.password_confirmation;
+
     const updatePassword: FormEventHandler = (e) => {
         e.preventDefault();
 
@@ -59,12 +65,13 @@ export default function UpdatePasswordForm({
                 </p>
             </header>
 
-            <form onSubmit={updatePassword} className="mt-5 space-y-4 max-w-xl">
+            <form onSubmit={updatePassword} className="mt-5 space-y-5 w-full">
                 <div>
                     <InputLabel
                         htmlFor="current_password"
                         value="Password Saat Ini"
-                        className="text-xs font-semibold text-slate-700 dark:text-slate-300"
+                        required
+                        className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5"
                     />
 
                     <TextInput
@@ -76,13 +83,13 @@ export default function UpdatePasswordForm({
                         }
                         type="password"
                         placeholder="Password saat ini"
-                        className="mt-1.5 block w-full rounded-lg text-xs"
+                        className="block w-full rounded-lg text-sm py-2.5 px-3.5"
                         autoComplete="current-password"
                     />
 
                     <InputError
                         message={errors.current_password}
-                        className="mt-1.5 text-xs text-rose-600 dark:text-rose-400"
+                        className="mt-1 text-xs text-rose-600 dark:text-rose-400"
                     />
                 </div>
 
@@ -90,7 +97,8 @@ export default function UpdatePasswordForm({
                     <InputLabel
                         htmlFor="password"
                         value="Password Baru"
-                        className="text-xs font-semibold text-slate-700 dark:text-slate-300"
+                        required
+                        className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5"
                     />
 
                     <TextInput
@@ -100,18 +108,19 @@ export default function UpdatePasswordForm({
                         onChange={(e) => setData('password', e.target.value)}
                         type="password"
                         placeholder="Password baru"
-                        className="mt-1.5 block w-full rounded-lg text-xs"
+                        className="block w-full rounded-lg text-sm py-2.5 px-3.5"
                         autoComplete="new-password"
                     />
 
-                    <InputError message={errors.password} className="mt-1.5 text-xs text-rose-600 dark:text-rose-400" />
+                    <InputError message={errors.password} className="mt-1 text-xs text-rose-600 dark:text-rose-400" />
                 </div>
 
                 <div>
                     <InputLabel
                         htmlFor="password_confirmation"
                         value="Konfirmasi Password"
-                        className="text-xs font-semibold text-slate-700 dark:text-slate-300"
+                        required
+                        className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5"
                     />
 
                     <TextInput
@@ -122,21 +131,21 @@ export default function UpdatePasswordForm({
                         }
                         type="password"
                         placeholder="Ulangi password baru"
-                        className="mt-1.5 block w-full rounded-lg text-xs"
+                        className="block w-full rounded-lg text-sm py-2.5 px-3.5"
                         autoComplete="new-password"
                     />
 
                     <InputError
                         message={errors.password_confirmation}
-                        className="mt-1.5 text-xs text-rose-600 dark:text-rose-400"
+                        className="mt-1 text-xs text-rose-600 dark:text-rose-400"
                     />
                 </div>
 
                 <div className="flex items-center gap-3 pt-2">
                     <button
                         type="submit"
-                        disabled={processing}
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-[#9e1a1a] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#831414] disabled:opacity-50"
+                        disabled={!isFormValid || processing}
+                        className="inline-flex items-center gap-2 rounded-lg bg-[#9e1a1a] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#831414] disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                     >
                         {processing ? (
                             <Loader2 className="h-4 w-4 animate-spin text-white" />

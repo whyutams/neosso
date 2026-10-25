@@ -4,6 +4,7 @@ import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import { Loader2, Send } from 'lucide-react';
 
 export default function ForgotPassword({ status }: { status?: string }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -27,14 +28,14 @@ export default function ForgotPassword({ status }: { status?: string }) {
             </div>
 
             {status && (
-                <div className="mb-5 rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
+                <div className="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
                     {status}
                 </div>
             )}
 
             <form onSubmit={submit} className="space-y-4" noValidate>
                 <div>
-                    <InputLabel htmlFor="email" value="Email" className="text-xs font-medium text-slate-700" />
+                    <InputLabel htmlFor="email" value="Email" required className="text-xs font-medium text-slate-700" />
                     <TextInput
                         id="email"
                         type="email"
@@ -52,10 +53,20 @@ export default function ForgotPassword({ status }: { status?: string }) {
                 <button
                     type="submit"
                     id="btn-send-reset"
-                    disabled={processing}
-                    className="w-full rounded-md bg-ung-maroon py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-ung-maroon-700 focus:outline-none focus:ring-2 focus:ring-ung-maroon focus:ring-offset-2 disabled:opacity-50"
+                    disabled={!data.email.trim() || processing}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-ung-maroon py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-ung-maroon-700 focus:outline-none focus:ring-2 focus:ring-ung-maroon focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {processing ? 'Mengirim...' : 'Kirim Tautan Reset'}
+                    {processing ? (
+                        <>
+                            <Loader2 className="h-4 w-4 animate-spin text-white" />
+                            <span>Mengirim...</span>
+                        </>
+                    ) : (
+                        <>
+                            <Send className="h-4 w-4" />
+                            <span>Kirim Tautan Reset</span>
+                        </>
+                    )}
                 </button>
             </form>
         </GuestLayout>

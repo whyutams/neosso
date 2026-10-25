@@ -61,9 +61,8 @@ export default function DeleteUserForm({
             <button
                 type="button"
                 onClick={confirmUserDeletion}
-                className="inline-flex items-center gap-1.5 rounded-lg bg-rose-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-rose-700"
+                className="inline-flex items-center justify-center rounded-lg bg-rose-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-700 shadow-sm"
             >
-                <Trash2 className="h-4 w-4" />
                 <span>Hapus Akun</span>
             </button>
 
@@ -93,7 +92,7 @@ export default function DeleteUserForm({
                             onChange={(e) =>
                                 setData('password', e.target.value)
                             }
-                            className="mt-1.5 block w-full rounded-xl text-sm px-3.5 py-2.5"
+                            className="mt-1.5 block w-full rounded-lg text-sm px-3.5 py-2.5"
                             isFocused
                             placeholder="Password Anda"
                         />
@@ -108,15 +107,15 @@ export default function DeleteUserForm({
                         <button
                             type="button"
                             onClick={closeModal}
-                            className="rounded-xl border border-slate-200 dark:border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-800"
+                            className="rounded-lg border border-slate-200 dark:border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-800"
                         >
                             Batal
                         </button>
 
                         <button
                             type="submit"
-                            disabled={processing}
-                            className="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:opacity-50 shadow-sm"
+                            disabled={!data.password || processing}
+                            className="inline-flex items-center gap-2 rounded-lg bg-rose-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                         >
                             {processing ? (
                                 <Loader2 className="h-4 w-4 animate-spin text-white" />

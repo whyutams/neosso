@@ -13,10 +13,15 @@ interface PaginationProps {
 }
 
 export default function Pagination({ from, to, total, links }: PaginationProps) {
+    const displayFrom = total > 0 ? (from ?? 1) : 0;
+    const displayTo = total > 0 ? (to ?? total) : 0;
+
     return (
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-4 py-3 shadow-sm">
             <p className="text-xs text-slate-500 dark:text-slate-400">
-                {from || (total > 0 ? 1 : 0)} - {to || total} dari {total}
+                Menampilkan <span className="font-semibold text-slate-700 dark:text-slate-200">{displayFrom}</span> -{' '}
+                <span className="font-semibold text-slate-700 dark:text-slate-200">{displayTo}</span> dari{' '}
+                <span className="font-semibold text-slate-700 dark:text-slate-200">{total || 0}</span> data
             </p>
             <div className="flex items-center gap-1">
                 {links && links.length > 0 ? (
@@ -67,16 +72,36 @@ export default function Pagination({ from, to, total, links }: PaginationProps) 
                                 key={idx}
                                 title={title}
                                 aria-label={title}
-                                className={`${baseClass} text-slate-300 dark:text-slate-600 cursor-not-allowed select-none`}
+                                className={`${baseClass} ${
+                                    link.active
+                                        ? 'bg-[#9e1a1a] text-white shadow-sm'
+                                        : 'text-slate-300 dark:text-slate-600 cursor-not-allowed select-none'
+                                }`}
                             >
                                 {content}
                             </span>
                         );
                     })
                 ) : (
-                    <span className="inline-flex h-8 min-w-[32px] items-center justify-center rounded-lg bg-[#9e1a1a] px-2.5 text-xs font-semibold text-white shadow-sm">
-                        1
-                    </span>
+                    <>
+                        <span
+                            title="Sebelumnya"
+                            aria-label="Sebelumnya"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold text-slate-300 dark:text-slate-600 cursor-not-allowed select-none"
+                        >
+                            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+                        </span>
+                        <span className="inline-flex h-8 min-w-[32px] items-center justify-center rounded-lg bg-[#9e1a1a] px-2.5 text-xs font-semibold text-white shadow-sm">
+                            1
+                        </span>
+                        <span
+                            title="Berikutnya"
+                            aria-label="Berikutnya"
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold text-slate-300 dark:text-slate-600 cursor-not-allowed select-none"
+                        >
+                            <ChevronRight className="h-4 w-4" aria-hidden="true" />
+                        </span>
+                    </>
                 )}
             </div>
         </div>

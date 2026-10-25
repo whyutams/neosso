@@ -21,6 +21,7 @@ class Layanan extends Model
      */
     protected $fillable = [
         'jurusan_id',
+        'program_studi_id',
         'nama_layanan',
         'slug',
         'deskripsi',
@@ -50,6 +51,12 @@ class Layanan extends Model
     public function jurusan(): BelongsTo
     {
         return $this->belongsTo(Jurusan::class, 'jurusan_id');
+    }
+
+    // Relasi program studi
+    public function programStudi(): BelongsTo
+    {
+        return $this->belongsTo(ProgramStudi::class, 'program_studi_id');
     }
 
     // Relasi hak akses layanan

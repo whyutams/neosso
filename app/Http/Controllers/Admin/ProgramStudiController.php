@@ -22,8 +22,10 @@ class ProgramStudiController extends Controller
             ->withCount(['mahasiswa'])
             ->orderBy('id', 'asc');
 
-        // Admin jurusan dibatasi hanya program studi jurusannya
-        if ($user->isAdmin()) {
+        // Batasi data sesuai peran
+        if ($user->isAdminProdi()) {
+            $query->where('id', $user->program_studi_id);
+        } elseif ($user->isAdmin()) {
             $query->where('jurusan_id', $user->jurusan_id);
         } elseif ($request->filled('jurusan_id')) {
             $query->where('jurusan_id', $request->input('jurusan_id'));
@@ -44,7 +46,7 @@ class ProgramStudiController extends Controller
 
         $jurusanList = $user->isSuperAdmin()
             ? Jurusan::where('is_active', true)->orderBy('nama_jurusan')->get(['id', 'nama_jurusan'])
-            : Jurusan::where('id', $user->jurusan_id)->get(['id', 'nama_jurusan']);
+            : collect();
 
         return Inertia::render('Admin/ProgramStudi/Index', [
             'prodiList' => Inertia::defer(fn () => $query->paginate(10)->withQueryString()),
@@ -55,6 +57,9 @@ class ProgramStudiController extends Controller
                 'status' => $request->input('status', ''),
             ],
             'canManageAll' => $user->isSuperAdmin(),
+            'canCreate' => ! $user->isAdminProdi(),
+            'canDelete' => ! $user->isAdminProdi(),
+            'canToggle' => ! $user->isAdminProdi(),
         ]);
     }
 
@@ -62,6 +67,11 @@ class ProgramStudiController extends Controller
     public function create(Request $request): Response
     {
         $user = $request->user();
+
+        if ($user->isAdminProdi()) {
+            abort(403, 'Akses terbatas untuk Administrator Jurusan atau Super Admin.');
+        }
+
         $jurusanList = $user->isSuperAdmin()
             ? Jurusan::where('is_active', true)->orderBy('nama_jurusan')->get(['id', 'nama_jurusan'])
             : Jurusan::where('id', $user->jurusan_id)->get(['id', 'nama_jurusan']);
@@ -78,6 +88,10 @@ class ProgramStudiController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $user = $request->user();
+
+        if ($user->isAdminProdi()) {
+            abort(403, 'Akses terbatas untuk Administrator Jurusan atau Super Admin.');
+        }
 
         $validated = $request->validate([
             'nama_prodi' => ['required', 'string', 'max:255'],
@@ -108,19 +122,25 @@ class ProgramStudiController extends Controller
     {
         $user = $request->user();
 
+        if ($user->isAdminProdi() && $programStudi->id !== $user->program_studi_id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengubah program studi ini.');
+        }
+
         if ($user->isAdmin() && $programStudi->jurusan_id !== $user->jurusan_id) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah program studi ini.');
         }
 
+        $jurusanId = $programStudi->jurusan_id ?: $user->jurusan_id;
         $jurusanList = $user->isSuperAdmin()
             ? Jurusan::where('is_active', true)->orderBy('nama_jurusan')->get(['id', 'nama_jurusan'])
-            : Jurusan::where('id', $user->jurusan_id)->get(['id', 'nama_jurusan']);
+            : Jurusan::where('id', $jurusanId)->get(['id', 'nama_jurusan']);
 
         return Inertia::render('Admin/ProgramStudi/Form', [
             'prodi' => $programStudi,
             'jurusanList' => $jurusanList,
-            'userJurusanId' => $user->jurusan_id,
+            'userJurusanId' => $jurusanId,
             'canManageAll' => $user->isSuperAdmin(),
+            'canManageStatus' => ! $user->isAdminProdi(),
         ]);
     }
 
@@ -129,20 +149,33 @@ class ProgramStudiController extends Controller
     {
         $user = $request->user();
 
+        if ($user->isAdminProdi() && $programStudi->id !== $user->program_studi_id) {
+            abort(403, 'Anda tidak memiliki hak akses untuk mengubah program studi ini.');
+        }
+
         if ($user->isAdmin() && $programStudi->jurusan_id !== $user->jurusan_id) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah program studi ini.');
+        }
+
+        if (! $user->isSuperAdmin()) {
+            $request->merge([
+                'jurusan_id' => $programStudi->jurusan_id ?: $user->jurusan_id,
+            ]);
         }
 
         $validated = $request->validate([
             'nama_prodi' => ['required', 'string', 'max:255'],
             'kode_prodi' => ['nullable', 'string', 'max:20'],
             'jenjang' => ['required', 'string', 'in:D3,D4,S1,S2,S3,Profesi'],
-            'jurusan_id' => ['required', 'exists:jurusan,id'],
+            'jurusan_id' => [$user->isSuperAdmin() ? 'required' : 'nullable', 'exists:jurusan,id'],
             'is_active' => ['boolean'],
         ]);
 
-        if ($user->isAdmin()) {
-            $validated['jurusan_id'] = $user->jurusan_id;
+        if ($user->isAdminProdi()) {
+            $validated['jurusan_id'] = $programStudi->jurusan_id;
+            $validated['is_active'] = $programStudi->is_active;
+        } elseif ($user->isAdmin()) {
+            $validated['jurusan_id'] = $user->jurusan_id ?? $programStudi->jurusan_id;
         }
 
         $programStudi->update([
@@ -161,6 +194,10 @@ class ProgramStudiController extends Controller
     public function destroy(Request $request, ProgramStudi $programStudi): RedirectResponse
     {
         $user = $request->user();
+
+        if ($user->isAdminProdi()) {
+            abort(403, 'Akses terbatas untuk Administrator Jurusan atau Super Admin.');
+        }
 
         if ($user->isAdmin() && $programStudi->jurusan_id !== $user->jurusan_id) {
             abort(403, 'Anda tidak memiliki hak akses untuk menghapus program studi ini.');
@@ -181,6 +218,10 @@ class ProgramStudiController extends Controller
     public function toggleStatus(Request $request, ProgramStudi $programStudi): RedirectResponse
     {
         $user = $request->user();
+
+        if ($user->isAdminProdi()) {
+            abort(403, 'Akses terbatas untuk Administrator Jurusan atau Super Admin.');
+        }
 
         if ($user->isAdmin() && $programStudi->jurusan_id !== $user->jurusan_id) {
             abort(403, 'Anda tidak memiliki hak akses untuk mengubah status program studi ini.');

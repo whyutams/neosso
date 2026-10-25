@@ -1,4 +1,3 @@
-import { Transition } from '@headlessui/react';
 import { InertiaLinkProps, Link } from '@inertiajs/react';
 import {
     createContext,
@@ -29,7 +28,6 @@ const Dropdown = ({ children }: PropsWithChildren) => {
         setOpen((previousState) => !previousState);
     };
 
-    // Deteksi klik di luar div dropdown dan tombol Escape
     useEffect(() => {
         if (!open) return;
 
@@ -77,7 +75,7 @@ const Trigger = ({ children }: PropsWithChildren) => {
 const Content = ({
     align = 'right',
     width = '48',
-    contentClasses = 'py-1 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-xl rounded-xl',
+    contentClasses = 'py-1 bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xl rounded-lg',
     children,
 }: PropsWithChildren<{
     align?: 'left' | 'right';
@@ -86,12 +84,14 @@ const Content = ({
 }>) => {
     const { open, setOpen } = useContext(DropDownContext);
 
+    if (!open) return null;
+
     let alignmentClasses = 'origin-top';
 
     if (align === 'left') {
-        alignmentClasses = 'ltr:origin-top-left rtl:origin-top-right start-0';
+        alignmentClasses = 'ltr:origin-top-left rtl:origin-top-right start-0 left-0';
     } else if (align === 'right') {
-        alignmentClasses = 'ltr:origin-top-right rtl:origin-top-left end-0';
+        alignmentClasses = 'ltr:origin-top-right rtl:origin-top-left end-0 right-0';
     }
 
     let widthClasses = '';
@@ -109,26 +109,14 @@ const Content = ({
     }
 
     return (
-        <>
-            <Transition
-                show={open}
-                enter="transition ease-out duration-200"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="transition ease-in duration-75"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-            >
-                <div
-                    className={`absolute z-50 mt-2 ${alignmentClasses} ${widthClasses}`}
-                    onClick={() => setOpen(false)}
-                >
-                    <div className={contentClasses}>
-                        {children}
-                    </div>
-                </div>
-            </Transition>
-        </>
+        <div
+            className={`absolute z-50 mt-2 ${alignmentClasses} ${widthClasses} origin-top-right transition-all duration-150`}
+            onClick={() => setOpen(false)}
+        >
+            <div className={contentClasses}>
+                {children}
+            </div>
+        </div>
     );
 };
 

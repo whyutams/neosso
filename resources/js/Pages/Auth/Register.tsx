@@ -4,6 +4,7 @@ import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import { Loader2, UserPlus } from 'lucide-react';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -12,6 +13,13 @@ export default function Register() {
         password: '',
         password_confirmation: '',
     });
+
+    const isFormValid =
+        data.name.trim().length > 0 &&
+        data.email.trim().length > 0 &&
+        data.password.length >= 8 &&
+        data.password_confirmation.length > 0 &&
+        data.password === data.password_confirmation;
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -34,7 +42,7 @@ export default function Register() {
 
             <form onSubmit={submit} className="space-y-4" noValidate>
                 <div>
-                    <InputLabel htmlFor="name" value="Nama Lengkap" className="text-xs font-medium text-slate-700" />
+                    <InputLabel htmlFor="name" value="Nama Lengkap" required className="text-xs font-medium text-slate-700" />
                     <TextInput
                         id="name"
                         name="name"
@@ -50,7 +58,7 @@ export default function Register() {
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="email" value="Email" className="text-xs font-medium text-slate-700" />
+                    <InputLabel htmlFor="email" value="Email" required className="text-xs font-medium text-slate-700" />
                     <TextInput
                         id="email"
                         type="email"
@@ -66,7 +74,7 @@ export default function Register() {
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="password" value="Password" className="text-xs font-medium text-slate-700" />
+                    <InputLabel htmlFor="password" value="Password" required className="text-xs font-medium text-slate-700" />
                     <TextInput
                         id="password"
                         type="password"
@@ -82,7 +90,7 @@ export default function Register() {
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="password_confirmation" value="Konfirmasi Password" className="text-xs font-medium text-slate-700" />
+                    <InputLabel htmlFor="password_confirmation" value="Konfirmasi Password" required className="text-xs font-medium text-slate-700" />
                     <TextInput
                         id="password_confirmation"
                         type="password"
@@ -99,10 +107,20 @@ export default function Register() {
 
                 <button
                     type="submit"
-                    disabled={processing}
-                    className="w-full rounded-md bg-ung-maroon py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-ung-maroon-700 focus:outline-none focus:ring-2 focus:ring-ung-maroon focus:ring-offset-2 disabled:opacity-50"
+                    disabled={!isFormValid || processing}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-ung-maroon py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-ung-maroon-700 focus:outline-none focus:ring-2 focus:ring-ung-maroon focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {processing ? 'Memproses...' : 'Daftar'}
+                    {processing ? (
+                        <>
+                            <Loader2 className="h-4 w-4 animate-spin text-white" />
+                            <span>Memproses...</span>
+                        </>
+                    ) : (
+                        <>
+                            <UserPlus className="h-4 w-4" />
+                            <span>Daftar</span>
+                        </>
+                    )}
                 </button>
 
                 <div className="text-center">

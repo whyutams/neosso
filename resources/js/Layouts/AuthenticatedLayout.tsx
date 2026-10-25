@@ -1,5 +1,8 @@
+import ConfirmModal from '@/Components/ConfirmModal';
 import Dropdown from '@/Components/Dropdown';
 import ThemeToggle from '@/Components/ThemeToggle';
+import Tooltip from '@/Components/Tooltip';
+import packageJson from '../../../package.json';
 import { Link, router, usePage } from '@inertiajs/react';
 import {
     AlertTriangle,
@@ -172,6 +175,16 @@ export default function Authenticated({
         }
     };
 
+    const handleLogout = () => {
+        setIsLoggingOut(true);
+        router.post(route('logout'), {}, {
+            onFinish: () => {
+                setIsLoggingOut(false);
+                setShowLogoutModal(false);
+            },
+        });
+    };
+
 
     const toggleSidebarCollapsed = () => {
         setSidebarCollapsed((prev) => {
@@ -183,16 +196,9 @@ export default function Authenticated({
         });
     };
 
-    const handleLogout = () => {
-        setIsLoggingOut(true);
-        router.post(route('logout'), {}, {
-            onFinish: () => setIsLoggingOut(false),
-        });
-    };
-
     const roleName = {
         superadmin: 'Super Admin',
-        admin: 'Admin',
+        admin: 'Admin Jurusan',
         mahasiswa: 'Mahasiswa',
     }[user.role] || 'User';
 
@@ -241,24 +247,24 @@ export default function Authenticated({
                 active: route().current('admin.sso-clients.*'),
                 icon: <KeyRound className="h-5 w-5" />,
             },
-            {
-                name: 'Audit Log',
-                href: route('admin.audit-logs.index'),
-                active: route().current('admin.audit-logs.*'),
-                icon: <ShieldAlert className="h-5 w-5" />,
-            },
         ] : user.role === 'admin' ? [
             {
-                name: 'Layanan',
-                href: route('admin.layanan.index'),
-                active: route().current('admin.layanan.*'),
-                icon: <Layers className="h-5 w-5" />,
+                name: 'Jurusan',
+                href: route('admin.jurusan.index'),
+                active: route().current('admin.jurusan.*'),
+                icon: <Building2 className="h-5 w-5" />,
             },
             {
                 name: 'Program Studi',
                 href: route('admin.program-studi.index'),
                 active: route().current('admin.program-studi.*'),
                 icon: <GraduationCap className="h-5 w-5" />,
+            },
+            {
+                name: 'Layanan',
+                href: route('admin.layanan.index'),
+                active: route().current('admin.layanan.*'),
+                icon: <Layers className="h-5 w-5" />,
             },
         ] : []),
     ];
@@ -298,14 +304,15 @@ export default function Authenticated({
             <div className="space-y-6">
                 {isCollapsed ? (
                     <div className="flex justify-center py-1">
-                        <button
-                            type="button"
-                            onClick={toggleSidebarCollapsed}
-                            className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50/70 hover:text-[#9e1a1a] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-rose-400 transition-colors duration-200 ease-in-out"
-                            title="Perluas Sidebar"
-                        >
-                            <PanelLeftOpen className="h-5 w-5 transition-colors duration-200 ease-in-out" />
-                        </button>
+                        <Tooltip content="Perluas Sidebar" position="right">
+                            <button
+                                type="button"
+                                onClick={toggleSidebarCollapsed}
+                                className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50/70 hover:text-[#9e1a1a] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-rose-400 transition-colors duration-200 ease-in-out"
+                            >
+                                <PanelLeftOpen className="h-5 w-5 transition-colors duration-200 ease-in-out" />
+                            </button>
+                        </Tooltip>
                     </div>
                 ) : (
                     <div className="flex items-center justify-between px-2 py-1">
@@ -321,14 +328,15 @@ export default function Authenticated({
                                 className="h-9 w-auto object-contain select-none hidden dark:block"
                             />
                         </Link>
-                        <button
-                            type="button"
-                            onClick={toggleSidebarCollapsed}
-                            className="hidden lg:flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50/70 hover:text-[#9e1a1a] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-rose-400 transition-colors duration-200 ease-in-out"
-                            title="Kecilkan Sidebar"
-                        >
-                            <PanelLeftClose className="h-5 w-5 transition-colors duration-200 ease-in-out" />
-                        </button>
+                        <Tooltip content="Kecilkan Sidebar" position="bottom">
+                            <button
+                                type="button"
+                                onClick={toggleSidebarCollapsed}
+                                className="hidden lg:flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-rose-50/70 hover:text-[#9e1a1a] dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-rose-400 transition-colors duration-200 ease-in-out"
+                            >
+                                <PanelLeftClose className="h-5 w-5 transition-colors duration-200 ease-in-out" />
+                            </button>
+                        </Tooltip>
                     </div>
                 )}
 
@@ -339,27 +347,32 @@ export default function Authenticated({
                         )}
                         <nav className={`mt-2 ${isCollapsed ? 'space-y-2' : 'space-y-1'}`}>
                             {mainNav.map((item) => (
-                                <Link
+                                <Tooltip
                                     key={item.name}
-                                    href={item.href}
-                                    title={isCollapsed ? item.name : undefined}
-                                    className={`group flex items-center ${isCollapsed
-                                        ? 'justify-center h-10 w-10 mx-auto'
-                                        : 'justify-between px-3 py-2.5'
-                                        } rounded-lg text-sm font-medium transition-colors duration-200 ease-in-out ${item.active
-                                            ? 'bg-[#9e1a1a] text-white shadow-sm'
-                                            : 'text-slate-600 hover:bg-rose-50/70 hover:text-[#9e1a1a] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-rose-400'
-                                        }`}
+                                    content={item.name}
+                                    position="right"
+                                    enabled={isCollapsed}
                                 >
-                                    <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
-                                        <span className={`transition-colors duration-200 ease-in-out ${item.active ? 'text-white' : 'text-slate-400 group-hover:text-[#9e1a1a] dark:group-hover:text-rose-400'}`}>
-                                            {item.icon}
-                                        </span>
-                                        {!isCollapsed && (
-                                            <span className="transition-colors duration-200 ease-in-out">{item.name}</span>
-                                        )}
-                                    </div>
-                                </Link>
+                                    <Link
+                                        href={item.href}
+                                        className={`group flex items-center ${isCollapsed
+                                            ? 'justify-center h-10 w-10 mx-auto'
+                                            : 'justify-between px-3 py-2.5'
+                                            } rounded-lg text-sm font-medium transition-colors duration-200 ease-in-out ${item.active
+                                                ? 'bg-[#9e1a1a] text-white shadow-sm'
+                                                : 'text-slate-600 hover:bg-rose-50/70 hover:text-[#9e1a1a] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-rose-400'
+                                            }`}
+                                    >
+                                        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
+                                            <span className={`transition-colors duration-200 ease-in-out ${item.active ? 'text-white' : 'text-slate-400 group-hover:text-[#9e1a1a] dark:group-hover:text-rose-400'}`}>
+                                                {item.icon}
+                                            </span>
+                                            {!isCollapsed && (
+                                                <span className="transition-colors duration-200 ease-in-out">{item.name}</span>
+                                            )}
+                                        </div>
+                                    </Link>
+                                </Tooltip>
                             ))}
                         </nav>
                     </div>
@@ -387,34 +400,27 @@ export default function Authenticated({
             </div>
 
             <div className="pt-3 border-t border-slate-200/80 dark:border-slate-800 space-y-2">
-                <Link
-                    href="/"
-                    title={isCollapsed ? 'Beranda' : undefined}
-                    className={`group flex items-center ${isCollapsed
-                        ? 'justify-center h-10 w-10 mx-auto'
-                        : 'justify-between px-3 py-2.5'
-                        } rounded-lg text-sm font-medium text-slate-600 hover:bg-rose-50/70 hover:text-[#9e1a1a] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-rose-400 transition-colors duration-200 ease-in-out`}
-                >
-                    <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
-                        <span className="text-slate-400 group-hover:text-[#9e1a1a] dark:group-hover:text-rose-400 transition-colors duration-200 ease-in-out">
-                            <Home className="h-5 w-5" />
-                        </span>
+                <Tooltip content="Beranda" position="right" enabled={isCollapsed}>
+                    <Link
+                        href="/"
+                        className={`group flex items-center ${isCollapsed
+                            ? 'justify-center h-10 w-10 mx-auto'
+                            : 'justify-between px-3 py-2.5'
+                            } rounded-lg text-sm font-medium text-slate-600 hover:bg-rose-50/70 hover:text-[#9e1a1a] dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-rose-400 transition-colors duration-200 ease-in-out`}
+                    >
+                        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'gap-3'}`}>
+                            <span className="text-slate-400 group-hover:text-[#9e1a1a] dark:group-hover:text-rose-400 transition-colors duration-200 ease-in-out">
+                                <Home className="h-5 w-5" />
+                            </span>
+                            {!isCollapsed && (
+                                <span className="transition-colors duration-200 ease-in-out">Beranda</span>
+                            )}
+                        </div>
                         {!isCollapsed && (
-                            <span className="transition-colors duration-200 ease-in-out">Beranda</span>
+                            <ExternalLink className="h-4 w-4 text-slate-400 group-hover:text-[#9e1a1a] dark:group-hover:text-rose-400 transition-colors duration-200 ease-in-out" />
                         )}
-                    </div>
-                    {!isCollapsed && (
-                        <ExternalLink className="h-4 w-4 text-slate-400 group-hover:text-[#9e1a1a] dark:group-hover:text-rose-400 transition-colors duration-200 ease-in-out" />
-                    )}
-                </Link>
-
-                {!isCollapsed && (
-                    <div className="px-3 pt-0.5">
-                        <p className="text-[10px] text-slate-400 dark:text-slate-500">
-                            Universitas Negeri Gorontalo
-                        </p>
-                    </div>
-                )}
+                    </Link>
+                </Tooltip>
             </div>
         </div>
     );
@@ -452,7 +458,7 @@ export default function Authenticated({
                         <button
                             type="button"
                             onClick={() => setSidebarOpen(true)}
-                            className="flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 ease-in-out lg:hidden"
+                            className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 ease-in-out lg:hidden"
                         >
                             <Menu className="h-5 w-5" />
                         </button>
@@ -474,7 +480,7 @@ export default function Authenticated({
                                     }}
                                     onKeyDown={handleSearchKeyDown}
                                     placeholder="Cari layanan..."
-                                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/60 py-2.5 pl-10 pr-9 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 transition-colors duration-200 ease-in-out focus:border-[#9e1a1a] focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-[#9e1a1a]/20"
+                                    className="w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/60 py-2.5 pl-10 pr-9 text-xs sm:text-sm text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 transition-colors duration-200 ease-in-out focus:border-[#9e1a1a] focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-[#9e1a1a]/20"
                                 />
                                 {searchQuery && (
                                     <button
@@ -494,7 +500,7 @@ export default function Authenticated({
                             </form>
 
                             {searchOpen && searchQuery.trim().length > 0 && (
-                                <div className="absolute top-full left-0 right-0 mt-2 z-50 overflow-hidden rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl">
+                                <div className="absolute top-full left-0 right-0 mt-2 z-50 overflow-hidden rounded-lg border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-2xl">
                                     <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 px-4 py-2.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-50/70 dark:bg-slate-800/70">
                                         <div className="flex items-center gap-2 font-medium">
                                             <span>Hasil Pencarian</span>
@@ -514,14 +520,14 @@ export default function Authenticated({
 
                                     {isSearching && searchResults.length === 0 ? (
                                         <div className="py-8 text-center">
-                                            <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 dark:bg-rose-950/40 text-[#9e1a1a] mb-2">
+                                            <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-rose-50 dark:bg-rose-950/40 text-[#9e1a1a] mb-2">
                                                 <Loader2 className="h-5 w-5 animate-spin" />
                                             </div>
                                             <p className="text-xs font-medium text-slate-600 dark:text-slate-400">Mencari layanan...</p>
                                         </div>
                                     ) : !isSearching && searchResults.length === 0 ? (
                                         <div className="py-8 px-4 text-center">
-                                            <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400">
+                                            <div className="mx-auto mb-2.5 flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400">
                                                 <Search className="h-5 w-5" />
                                             </div>
                                             <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">Layanan tidak ditemukan</p>
@@ -535,7 +541,7 @@ export default function Authenticated({
                                                     <div
                                                         key={item.id}
                                                         onMouseEnter={() => setSelectedIndex(idx)}
-                                                        className={`group flex items-center justify-between gap-3 p-2.5 rounded-xl transition-colors duration-150 cursor-pointer ${isSelected ? 'bg-rose-50/80' : 'hover:bg-slate-50'
+                                                        className={`group flex items-center justify-between gap-3 p-2.5 rounded-lg transition-colors duration-150 cursor-pointer ${isSelected ? 'bg-rose-50/80' : 'hover:bg-slate-50'
                                                             }`}
                                                     >
                                                         <a
@@ -545,7 +551,7 @@ export default function Authenticated({
                                                             onClick={() => setSearchOpen(false)}
                                                             className="flex items-center gap-3 min-w-0 flex-1"
                                                         >
-                                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-slate-200/80 bg-white shadow-xs">
+                                                            <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200/80 bg-white shadow-xs">
                                                                 {item.icon_url ? (
                                                                     <img
                                                                         src={item.icon_url}
@@ -566,14 +572,14 @@ export default function Authenticated({
                                                                     <span className="truncate text-xs sm:text-sm font-semibold text-slate-800 group-hover:text-[#9e1a1a] transition-colors duration-150">
                                                                         {item.nama_layanan}
                                                                     </span>
-                                                                    <span className={`inline-flex shrink-0 items-center rounded-md px-1.5 py-0.5 text-[9px] font-semibold ${item.tipe_integrasi === 'sso'
+                                                                    <span className={`inline-flex shrink-0 items-center rounded-lg px-1.5 py-0.5 text-[9px] font-semibold ${item.tipe_integrasi === 'sso'
                                                                         ? 'bg-rose-50 text-[#9e1a1a] border border-rose-200/60'
                                                                         : 'bg-sky-50 text-sky-700 border border-sky-200/60'
                                                                         }`}>
                                                                         {item.tipe_integrasi === 'sso' ? 'SSO' : 'Eksternal'}
                                                                     </span>
                                                                     {!item.is_active && (
-                                                                        <span className="inline-flex shrink-0 items-center rounded-md bg-amber-50 px-1.5 py-0.5 text-[9px] font-semibold text-amber-700 border border-amber-200/60">
+                                                                        <span className="inline-flex shrink-0 items-center rounded-lg bg-amber-50 px-1.5 py-0.5 text-[9px] font-semibold text-amber-700 border border-amber-200/60">
                                                                             Nonaktif
                                                                         </span>
                                                                     )}
@@ -642,7 +648,7 @@ export default function Authenticated({
                                 <Dropdown.Trigger>
                                     <button
                                         type="button"
-                                        className="flex items-center gap-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-1.5 sm:px-3 sm:py-1.5 transition-colors duration-200 ease-in-out hover:bg-slate-50 dark:hover:bg-slate-800"
+                                        className="flex items-center gap-2.5 rounded-lg border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-1.5 sm:px-3 sm:py-1.5 transition-colors duration-200 ease-in-out hover:bg-slate-50 dark:hover:bg-slate-800"
                                     >
                                         {user.avatar ? (
                                             <img
@@ -683,7 +689,7 @@ export default function Authenticated({
                                         <div className="min-w-0 flex-1">
                                             <p className="truncate text-xs font-bold text-slate-800 dark:text-slate-100">{user.name}</p>
                                             <p className="truncate text-[11px] font-medium text-slate-500 dark:text-slate-400">{user.email}</p>
-                                            <span className="mt-1 inline-block rounded-md bg-[#9e1a1a]/10 dark:bg-rose-950/40 px-2 py-0.5 text-[10px] font-semibold text-[#9e1a1a] dark:text-rose-400">
+                                            <span className="mt-1 inline-block rounded-lg bg-[#9e1a1a]/10 dark:bg-rose-950/40 px-2 py-0.5 text-[10px] font-semibold text-[#9e1a1a] dark:text-rose-400">
                                                 {roleName}
                                             </span>
                                         </div>
@@ -691,13 +697,12 @@ export default function Authenticated({
                                     <Dropdown.Link href={route('profile.edit')}>
                                         Profil
                                     </Dropdown.Link>
-                                    <div className="border-t border-slate-100 dark:border-slate-700"></div>
                                     <button
                                         type="button"
                                         onClick={() => setShowLogoutModal(true)}
-                                        className="block w-full px-4 py-2 text-start text-sm leading-5 text-rose-600 dark:text-rose-400 transition-colors duration-200 ease-in-out hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-700 dark:hover:text-rose-300"
+                                        className="block w-full px-4 py-2 text-start text-sm leading-5 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-700 dark:hover:text-rose-300 transition-colors duration-200 ease-in-out dark:hover:bg-slate-800 focus:bg-slate-100 dark:focus:bg-slate-800 focus:outline-none"
                                     >
-                                        Logout
+                                        <span>Logout</span>
                                     </button>
                                 </Dropdown.Content>
                             </Dropdown>
@@ -711,7 +716,7 @@ export default function Authenticated({
                     </div>
                 )}
 
-                <main className="flex-1 px-4 py-6 sm:px-8 sm:py-8">
+                <main className="flex-1 px-4 pt-6 pb-2 sm:px-8 sm:pt-8">
                     {(usePage().props as any).flash?.success && (
                         <div className="mb-6 flex items-center justify-between rounded-lg border border-emerald-200 dark:border-emerald-800/40 bg-emerald-50 dark:bg-emerald-950/30 px-4 py-3 text-sm text-emerald-800 dark:text-emerald-300">
                             <div className="flex items-center gap-2.5">
@@ -732,47 +737,30 @@ export default function Authenticated({
 
                     {children}
                 </main>
+
+                <footer className="flex px-4 py-2 items-center justify-between text-sm sm:text-[1rem] mb-2">
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 px-4">
+                        Universitas Negeri Gorontalo
+                    </p>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 px-4">
+                        v{packageJson.version}
+                    </p>
+                </footer>
             </div>
 
-            {/* Modal Konfirmasi Log out */}
-            {showLogoutModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm">
-                    <div className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-900 p-6 sm:p-7 shadow-2xl border border-slate-100 dark:border-slate-800 space-y-4">
-                        <div className="flex items-center gap-3.5">
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/40">
-                                <LogOut className="h-6 w-6" />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">Konfirmasi Log out</h3>
-                            </div>
-                        </div>
-                        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                            Apakah Anda yakin ingin keluar?
-                        </p>
-                        <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
-                            <button
-                                type="button"
-                                disabled={isLoggingOut}
-                                onClick={() => setShowLogoutModal(false)}
-                                className="rounded-xl border border-slate-200 dark:border-slate-700 px-5 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-300 transition hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50"
-                            >
-                                Batal
-                            </button>
-                            <button
-                                type="button"
-                                disabled={isLoggingOut}
-                                onClick={handleLogout}
-                                className="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:opacity-50 shadow-sm"
-                            >
-                                {isLoggingOut && (
-                                    <Loader2 className="h-4 w-4 animate-spin text-white" />
-                                )}
-                                <span>{isLoggingOut ? 'Log out...' : 'Log out'}</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ConfirmModal
+                show={showLogoutModal}
+                title="Konfirmasi Logout"
+                message="Apakah Anda yakin ingin keluar dari sistem SSO UNG?"
+                confirmText="Logout"
+                cancelText="Batal"
+                isProcessing={isLoggingOut}
+                icon={<LogOut className="h-6 w-6 text-rose-600 dark:text-rose-400" />}
+                onConfirm={handleLogout}
+                onClose={() => {
+                    if (!isLoggingOut) setShowLogoutModal(false);
+                }}
+            />
         </div>
     );
 }

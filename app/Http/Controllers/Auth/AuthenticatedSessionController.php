@@ -27,6 +27,20 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $user = Auth::user();
+        if ($user) {
+            \App\Models\AuthLog::create([
+                'user_id' => $user->id,
+                'event' => 'login',
+                'email' => $user->email,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'status' => 'success',
+                'message' => 'Login berhasil via kredensial',
+                'created_at' => now(),
+            ]);
+        }
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 

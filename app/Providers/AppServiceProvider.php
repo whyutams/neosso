@@ -26,21 +26,14 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
 
-        // Paksa HTTPS di production
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
 
-        // Kebijakan password default
         Password::defaults(function () {
-            $rule = Password::min(12);
-
-            return $this->app->isProduction()
-                ? $rule->letters()->mixedCase()->numbers()->symbols()->uncompromised()
-                : $rule->letters()->numbers();
+            return Password::min(8)->letters()->numbers();
         });
 
-        // Listener log autentikasi
         Event::subscribe(LogAuthenticationEvents::class);
     }
 }

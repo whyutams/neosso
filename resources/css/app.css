@@ -13,6 +13,16 @@
     color: #ffffff;
 }
 
+select {
+    user-select: none;
+}
+
+select::selection,
+option::selection {
+    background-color: transparent !important;
+    color: inherit !important;
+}
+
 #nprogress .bar {
     background: #9e1a1a !important;
     height: 2px !important;

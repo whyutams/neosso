@@ -114,122 +114,52 @@ class UserController extends Controller
             abort(403, 'Akses terbatas untuk Super Admin.');
         }
 
+        if ($request->input('role') === 'mahasiswa' && $request->filled('program_studi_id')) {
+            $prodi = \App\Models\ProgramStudi::find($request->input('program_studi_id'));
+            if ($prodi) {
+                $request->merge(['jurusan_id' => $prodi->jurusan_id]);
+            }
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'confirmed', Password::min(8)->letters()->numbers()],
             'role' => ['required', 'string', Rule::in(['superadmin', 'admin', 'mahasiswa'])],
             'jurusan_id' => [
                 'nullable',
                 Rule::requiredIf(fn () => in_array($request->input('role'), ['admin', 'mahasiswa'])),
                 'exists:jurusan,id',
             ],
-            'program_studi_id' => ['nullable', 'exists:program_studi,id'],
+            'program_studi_id' => [
+                'nullable',
+                Rule::requiredIf(fn () => $request->input('role') === 'mahasiswa'),
+                'exists:program_studi,id',
+            ],
             'nim' => ['nullable', 'string', 'max:20', 'unique:users,nim'],
             'angkatan' => ['nullable', 'integer', 'min:2000', 'max:'.(date('Y') + 1)],
-            'password' => ['required', 'string', Password::min(8)],
             'is_active' => ['boolean'],
         ]);
+
+        $role = $validated['role'];
+        $jurusanId = in_array($role, ['admin', 'mahasiswa']) ? ($validated['jurusan_id'] ?? null) : null;
+        $prodiId = $role === 'mahasiswa' ? ($validated['program_studi_id'] ?? null) : null;
+        $nim = $role === 'mahasiswa' && ! empty($validated['nim']) ? trim($validated['nim']) : null;
+        $angkatan = $role === 'mahasiswa' ? ($validated['angkatan'] ?? null) : null;
 
         User::create([
             'name' => trim($validated['name']),
             'email' => strtolower(trim($validated['email'])),
-            'role' => $validated['role'],
-            'jurusan_id' => $validated['jurusan_id'] ?? null,
-            'program_studi_id' => $validated['program_studi_id'] ?? null,
-            'nim' => ! empty($validated['nim']) ? trim($validated['nim']) : null,
-            'angkatan' => $validated['angkatan'] ?? null,
+            'role' => $role,
+            'jurusan_id' => $jurusanId,
+            'program_studi_id' => $prodiId,
+            'nim' => $nim,
+            'angkatan' => $angkatan,
             'password' => Hash::make($validated['password']),
             'is_active' => $request->boolean('is_active', true),
         ]);
 
         return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil ditambahkan.');
-    }
-
-    // Formulir edit pengguna
-    public function edit(Request $request, User $user): Response
-    {
-        $currentUser = $request->user();
-
-        if (! $currentUser->isSuperAdmin()) {
-            abort(403, 'Akses terbatas untuk Super Admin.');
-        }
-
-        $jurusanList = Jurusan::where('is_active', true)
-            ->select('id', 'nama_jurusan')
-            ->orderBy('nama_jurusan')
-            ->get();
-
-        $prodiList = \App\Models\ProgramStudi::where('is_active', true)
-            ->select('id', 'jurusan_id', 'nama_prodi', 'jenjang')
-            ->orderBy('nama_prodi')
-            ->get();
-
-        return Inertia::render('Admin/Users/Form', [
-            'user' => $user->load(['jurusan', 'programStudi']),
-            'jurusanList' => $jurusanList,
-            'prodiList' => $prodiList,
-            'currentUserId' => $currentUser->id,
-        ]);
-    }
-
-    // Perbarui data pengguna
-    public function update(Request $request, User $user): RedirectResponse
-    {
-        $currentUser = $request->user();
-
-        if (! $currentUser->isSuperAdmin()) {
-            abort(403, 'Akses terbatas untuk Super Admin.');
-        }
-
-        $rules = [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'role' => ['required', 'string', Rule::in(['superadmin', 'admin', 'mahasiswa'])],
-            'jurusan_id' => [
-                'nullable',
-                Rule::requiredIf(fn () => in_array($request->input('role'), ['admin', 'mahasiswa'])),
-                'exists:jurusan,id',
-            ],
-            'program_studi_id' => ['nullable', 'exists:program_studi,id'],
-            'nim' => ['nullable', 'string', 'max:20', Rule::unique('users', 'nim')->ignore($user->id)],
-            'angkatan' => ['nullable', 'integer', 'min:2000', 'max:'.(date('Y') + 1)],
-            'is_active' => ['boolean'],
-        ];
-
-        if ($request->filled('password')) {
-            $rules['password'] = ['nullable', 'string', Password::min(8)];
-        }
-
-        $validated = $request->validate($rules);
-
-        // Larang menurunkan role sendiri
-        if ($user->id === $currentUser->id && $validated['role'] !== $currentUser->role) {
-            return back()->with('error', 'Anda tidak dapat mengubah role akun sendiri.');
-        }
-
-        // Larang menonaktifkan akun sendiri
-        if ($user->id === $currentUser->id && ! $request->boolean('is_active', true)) {
-            return back()->with('error', 'Anda tidak dapat menonaktifkan akun sendiri.');
-        }
-
-        $payload = [
-            'name' => trim($validated['name']),
-            'email' => strtolower(trim($validated['email'])),
-            'role' => $validated['role'],
-            'jurusan_id' => $validated['jurusan_id'] ?? null,
-            'program_studi_id' => $validated['program_studi_id'] ?? null,
-            'nim' => ! empty($validated['nim']) ? trim($validated['nim']) : null,
-            'angkatan' => $validated['angkatan'] ?? null,
-            'is_active' => $request->boolean('is_active', $user->is_active),
-        ];
-
-        if ($request->filled('password')) {
-            $payload['password'] = Hash::make($request->input('password'));
-        }
-
-        $user->update($payload);
-
-        return redirect()->route('admin.users.index')->with('success', 'Pengguna berhasil diperbarui.');
     }
 
     // Hapus pengguna

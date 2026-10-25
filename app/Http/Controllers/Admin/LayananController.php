@@ -24,11 +24,13 @@ class LayananController extends Controller
     {
         $user = $request->user();
 
-        $query = Layanan::with(['jurusan', 'ssoClient', 'aksesLayanan'])
+        $query = Layanan::with(['jurusan', 'programStudi', 'ssoClient', 'aksesLayanan'])
             ->orderBy('urutan', 'asc')
             ->orderBy('id', 'asc');
 
-        if (! $user->isSuperAdmin()) {
+        if ($user->isAdminProdi()) {
+            $query->where('program_studi_id', $user->program_studi_id);
+        } elseif (! $user->isSuperAdmin()) {
             $query->where('jurusan_id', $user->jurusan_id);
         } elseif ($request->filled('jurusan_id')) {
             $query->where('jurusan_id', $request->integer('jurusan_id'));
@@ -60,6 +62,7 @@ class LayananController extends Controller
             'filters' => $request->only(['q', 'tipe', 'status', 'jurusan_id']),
             'jurusanList' => $jurusanList,
             'isSuperAdmin' => $user->isSuperAdmin(),
+            'isAdminProdi' => $user->isAdminProdi(),
             'currentJurusan' => $user->jurusan,
         ]);
     }
@@ -73,7 +76,7 @@ class LayananController extends Controller
 
         $jurusanList = $user->isSuperAdmin()
             ? Jurusan::where('is_active', true)->select('id', 'nama_jurusan')->get()
-            : collect();
+            : Jurusan::where('id', $user->jurusan_id)->select('id', 'nama_jurusan')->get();
 
         return Inertia::render('Admin/Layanan/Form', [
             'layanan' => null,
@@ -93,6 +96,12 @@ class LayananController extends Controller
         $jurusanId = $user->isSuperAdmin()
             ? $request->input('jurusan_id')
             : $user->jurusan_id;
+
+        if (! $user->isSuperAdmin()) {
+            $request->merge([
+                'jurusan_id' => $jurusanId,
+            ]);
+        }
 
         $validated = $request->validate([
             'nama_layanan' => ['required', 'string', 'max:255'],
@@ -126,6 +135,7 @@ class LayananController extends Controller
 
         $layanan = Layanan::create([
             'jurusan_id' => $jurusanId,
+            'program_studi_id' => null,
             'nama_layanan' => $validated['nama_layanan'],
             'slug' => Str::slug($validated['slug']),
             'url' => $validated['url'],
@@ -171,15 +181,21 @@ class LayananController extends Controller
     {
         $user = $request->user();
 
+        if ($user->isAdminProdi() && $layanan->program_studi_id !== $user->program_studi_id) {
+            abort(403, 'Akses terbatas untuk program studi Anda.');
+        }
+
         if (! $user->canManageJurusan($layanan->jurusan_id)) {
             abort(403);
         }
 
         $layanan->load(['ssoClient', 'aksesLayanan']);
 
+        $jurusanId = $layanan->jurusan_id ?: $user->jurusan_id;
+
         $jurusanList = $user->isSuperAdmin()
-            ? Jurusan::where('is_active', true)->select('id', 'nama_jurusan')->get()
-            : collect();
+            ? Jurusan::where('is_active', true)->orWhere('id', $jurusanId)->select('id', 'nama_jurusan')->get()
+            : Jurusan::where('id', $jurusanId)->select('id', 'nama_jurusan')->get();
 
         return Inertia::render('Admin/Layanan/Form', [
             'layanan' => [
@@ -218,8 +234,12 @@ class LayananController extends Controller
         }
 
         $jurusanId = $user->isSuperAdmin()
-            ? $request->input('jurusan_id', $layanan->jurusan_id)
-            : $layanan->jurusan_id;
+            ? ($request->filled('jurusan_id') ? $request->input('jurusan_id') : $layanan->jurusan_id)
+            : ($layanan->jurusan_id ?: $user->jurusan_id);
+
+        $request->merge([
+            'jurusan_id' => $jurusanId,
+        ]);
 
         $validated = $request->validate([
             'nama_layanan' => ['required', 'string', 'max:255'],
@@ -258,6 +278,7 @@ class LayananController extends Controller
 
         $layanan->update([
             'jurusan_id' => $jurusanId,
+            'program_studi_id' => null,
             'nama_layanan' => $validated['nama_layanan'],
             'slug' => Str::slug($validated['slug']),
             'url' => $validated['url'],
@@ -299,6 +320,10 @@ class LayananController extends Controller
     {
         $user = $request->user();
 
+        if ($user->isAdminProdi() && $layanan->program_studi_id !== $user->program_studi_id) {
+            abort(403, 'Akses terbatas untuk program studi Anda.');
+        }
+
         if (! $user->canManageJurusan($layanan->jurusan_id)) {
             abort(403);
         }
@@ -314,6 +339,10 @@ class LayananController extends Controller
     public function toggleStatus(Request $request, Layanan $layanan): RedirectResponse
     {
         $user = $request->user();
+
+        if ($user->isAdminProdi() && $layanan->program_studi_id !== $user->program_studi_id) {
+            abort(403, 'Akses terbatas untuk program studi Anda.');
+        }
 
         if (! $user->canManageJurusan($layanan->jurusan_id)) {
             abort(403);
@@ -404,20 +433,23 @@ class LayananController extends Controller
         $user = $request->user();
         $query = Layanan::query();
 
-        // Mahasiswa hanya dapat melihat layanan aktif sesuai jurusannya
+        // Batasi pencarian sesuai peran dan unit akademik
         if ($user->role === 'mahasiswa') {
             $query->where('is_active', true);
-            if ($user->jurusan_id) {
-                $query->where(function ($sub) use ($user) {
-                    $sub->whereNull('jurusan_id')
-                        ->orWhere('jurusan_id', $user->jurusan_id);
-                });
-            }
-        } elseif ($user->role === 'admin' && $user->jurusan_id) {
             $query->where(function ($sub) use ($user) {
                 $sub->whereNull('jurusan_id')
-                    ->orWhere('jurusan_id', $user->jurusan_id);
+                    ->orWhere(function ($qJur) use ($user) {
+                        $qJur->where('jurusan_id', $user->jurusan_id)
+                            ->where(function ($qProdi) use ($user) {
+                                $qProdi->whereNull('program_studi_id')
+                                    ->orWhere('program_studi_id', $user->program_studi_id);
+                            });
+                    });
             });
+        } elseif ($user->isAdminProdi()) {
+            $query->where('program_studi_id', $user->program_studi_id);
+        } elseif ($user->isAdmin() && $user->jurusan_id) {
+            $query->where('jurusan_id', $user->jurusan_id);
         }
 
         $results = $query->where(function ($sub) use ($q) {

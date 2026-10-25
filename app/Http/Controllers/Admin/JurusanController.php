@@ -15,13 +15,19 @@ class JurusanController extends Controller
     // Tampilkan daftar jurusan
     public function index(Request $request): Response
     {
-        if (! $request->user()->isSuperAdmin()) {
-            abort(403, 'Akses terbatas untuk Super Admin.');
+        $user = $request->user();
+
+        if (! $user->isSuperAdmin() && ! $user->isAdmin()) {
+            abort(403, 'Akses terbatas untuk Administrator.');
         }
 
         $query = Jurusan::query()
             ->withCount(['admins', 'mahasiswa', 'layanan', 'programStudi'])
             ->orderBy('id', 'asc');
+
+        if ($user->isAdmin()) {
+            $query->where('id', $user->jurusan_id);
+        }
 
         if ($request->filled('q')) {
             $search = $request->input('q');
@@ -39,6 +45,9 @@ class JurusanController extends Controller
                 'q' => $request->input('q', ''),
                 'status' => $request->input('status', ''),
             ],
+            'canCreate' => $user->isSuperAdmin(),
+            'canDelete' => $user->isSuperAdmin(),
+            'canToggle' => $user->isSuperAdmin(),
         ]);
     }
 
@@ -51,6 +60,7 @@ class JurusanController extends Controller
 
         return Inertia::render('Admin/Jurusan/Form', [
             'jurusan' => null,
+            'isSuperAdmin' => true,
         ]);
     }
 
@@ -77,20 +87,25 @@ class JurusanController extends Controller
     // Formulir edit jurusan
     public function edit(Request $request, Jurusan $jurusan): Response
     {
-        if (! $request->user()->isSuperAdmin()) {
-            abort(403, 'Akses terbatas untuk Super Admin.');
+        $user = $request->user();
+
+        if (! $user->isSuperAdmin() && (! $user->isAdmin() || $user->jurusan_id !== $jurusan->id)) {
+            abort(403, 'Akses terbatas untuk jurusan Anda.');
         }
 
         return Inertia::render('Admin/Jurusan/Form', [
             'jurusan' => $jurusan,
+            'isSuperAdmin' => $user->isSuperAdmin(),
         ]);
     }
 
     // Perbarui data jurusan
     public function update(Request $request, Jurusan $jurusan): RedirectResponse
     {
-        if (! $request->user()->isSuperAdmin()) {
-            abort(403, 'Akses terbatas untuk Super Admin.');
+        $user = $request->user();
+
+        if (! $user->isSuperAdmin() && (! $user->isAdmin() || $user->jurusan_id !== $jurusan->id)) {
+            abort(403, 'Akses terbatas untuk jurusan Anda.');
         }
 
         $validated = $request->validate([
@@ -98,9 +113,13 @@ class JurusanController extends Controller
             'is_active' => ['boolean'],
         ]);
 
+        $isActive = $user->isSuperAdmin()
+            ? $request->boolean('is_active', $jurusan->is_active)
+            : $jurusan->is_active;
+
         $jurusan->update([
             'nama_jurusan' => trim($validated['nama_jurusan']),
-            'is_active' => $request->boolean('is_active', $jurusan->is_active),
+            'is_active' => $isActive,
         ]);
 
         return redirect()->route('admin.jurusan.index')->with('success', 'Jurusan berhasil diperbarui.');

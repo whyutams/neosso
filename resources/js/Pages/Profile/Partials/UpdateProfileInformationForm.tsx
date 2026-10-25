@@ -39,12 +39,12 @@ export default function UpdateProfileInformation({
                 </p>
             </header>
 
-            <form onSubmit={submit} className="mt-5 space-y-4 max-w-xl">
+            <form onSubmit={submit} className="mt-5 space-y-5 w-full">
                 <div>
-                    <InputLabel htmlFor="name" value="Nama" className="text-xs font-semibold text-slate-700 dark:text-slate-300" />
+                    <InputLabel htmlFor="name" value="Nama" required className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5" />
                     <TextInput
                         id="name"
-                        className="mt-1.5 block w-full rounded-lg text-xs"
+                        className="block w-full rounded-lg text-sm py-2.5 px-3.5"
                         value={data.name}
                         onChange={(e) => setData('name', e.target.value)}
                         placeholder="Nama Anda"
@@ -52,26 +52,26 @@ export default function UpdateProfileInformation({
                         isFocused
                         autoComplete="name"
                     />
-                    <InputError className="mt-1.5 text-xs text-rose-600 dark:text-rose-400" message={errors.name} />
+                    <InputError className="mt-1 text-xs text-rose-600 dark:text-rose-400" message={errors.name} />
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="email" value="Email" className="text-xs font-semibold text-slate-700 dark:text-slate-300" />
+                    <InputLabel htmlFor="email" value="Email" required className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5" />
                     <TextInput
                         id="email"
                         type="email"
-                        className="mt-1.5 block w-full rounded-lg text-xs"
+                        className="block w-full rounded-lg text-sm py-2.5 px-3.5"
                         value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
                         placeholder="Alamat email Anda"
                         required
                         autoComplete="username"
                     />
-                    <InputError className="mt-1.5 text-xs text-rose-600 dark:text-rose-400" message={errors.email} />
+                    <InputError className="mt-1 text-xs text-rose-600 dark:text-rose-400" message={errors.email} />
                 </div>
 
                 {mustVerifyEmail && user.email_verified_at === null && (
-                    <div className="rounded-lg bg-amber-50 dark:bg-amber-950/40 p-3 text-xs text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60">
+                    <div className="rounded-lg bg-amber-50 dark:bg-amber-950/40 p-3.5 text-sm text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60">
                         <p>
                             Alamat email Anda belum diverifikasi.{' '}
                             <Link
@@ -95,8 +95,8 @@ export default function UpdateProfileInformation({
                 <div className="flex items-center gap-3 pt-2">
                     <button
                         type="submit"
-                        disabled={processing}
-                        className="inline-flex items-center gap-1.5 rounded-lg bg-[#9e1a1a] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#831414] disabled:opacity-50"
+                        disabled={!data.name.trim() || !data.email.trim() || processing}
+                        className="inline-flex items-center gap-2 rounded-lg bg-[#9e1a1a] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#831414] disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
                     >
                         {processing ? (
                             <Loader2 className="h-4 w-4 animate-spin text-white" />

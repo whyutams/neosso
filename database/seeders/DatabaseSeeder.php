@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             LayananSeeder::class,
             SsoClientSeeder::class,
+            AuthLogSeeder::class,
         ]);
     }
 }

@@ -98,7 +98,7 @@ export default function Index({ logs, filters }: Props) {
             <Head title="Audit Log" />
 
             <div className="space-y-6">
-                <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+                <div className="rounded-lg border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div className="space-y-1">
                             <nav className="flex items-center gap-1.5 text-xs">
@@ -121,7 +121,7 @@ export default function Index({ logs, filters }: Props) {
                     </div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 shadow-sm">
+                <div className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3.5 shadow-sm">
                     <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                         <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-sm">
                             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -132,7 +132,7 @@ export default function Index({ logs, filters }: Props) {
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 placeholder="Cari email, IP address, atau pesan..."
-                                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 py-1.5 pl-9 pr-8 text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:border-[#9e1a1a] focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-[#9e1a1a]"
+                                className="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 py-1.5 pl-9 pr-8 text-xs text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:border-[#9e1a1a] focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-[#9e1a1a]"
                             />
                             {search && (
                                 <button
@@ -155,7 +155,7 @@ export default function Index({ logs, filters }: Props) {
                                     setSelectedEvent(e.target.value);
                                     handleFilterChange({ event: e.target.value });
                                 }}
-                                className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 py-1.5 pl-3 pr-8 text-xs text-slate-700 dark:text-slate-200 focus:border-[#9e1a1a] focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-[#9e1a1a]"
+                                className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 py-1.5 pl-3 pr-8 text-xs text-slate-700 dark:text-slate-200 focus:border-[#9e1a1a] focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-[#9e1a1a]"
                             >
                                 <option value="">Semua Event</option>
                                 <option value="login">Login</option>
@@ -170,7 +170,7 @@ export default function Index({ logs, filters }: Props) {
                                     setSelectedStatus(e.target.value);
                                     handleFilterChange({ status: e.target.value });
                                 }}
-                                className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 py-1.5 pl-3 pr-8 text-xs text-slate-700 dark:text-slate-200 focus:border-[#9e1a1a] focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-[#9e1a1a]"
+                                className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 py-1.5 pl-3 pr-8 text-xs text-slate-700 dark:text-slate-200 focus:border-[#9e1a1a] focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-1 focus:ring-[#9e1a1a]"
                             >
                                 <option value="">Semua Status</option>
                                 <option value="success">Sukses</option>
@@ -184,7 +184,7 @@ export default function Index({ logs, filters }: Props) {
                 <Deferred data="logs" fallback={<TableSkeleton columns={7} rows={8} />}>
                     {logs && (
                         <>
-                            <div className="w-full max-w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
+                            <div className="w-full max-w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
                                 <div className="w-full overflow-x-auto">
                                     <table className="w-full min-w-[700px] text-left text-xs">
                                         <thead className="bg-slate-50/80 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-semibold uppercase tracking-wider text-[11px]">
@@ -217,7 +217,7 @@ export default function Index({ logs, filters }: Props) {
                                                             </div>
                                                         </td>
                                                         <td className="py-3 px-4">
-                                                            <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                                                            <span className="inline-flex items-center px-2 py-0.5 rounded-lg text-[11px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                                                                 {item.event}
                                                             </span>
                                                         </td>
@@ -265,9 +265,9 @@ export default function Index({ logs, filters }: Props) {
 
             {/* Modal Detail Log */}
             {detailLog && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
                     <div className="fixed inset-0 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm" onClick={() => setDetailLog(null)} />
-                    <div className="relative w-full max-w-xl rounded-2xl bg-white dark:bg-slate-900 p-6 sm:p-7 shadow-2xl border border-slate-100 dark:border-slate-800">
+                    <div className="relative my-auto w-full max-w-xl rounded-lg bg-white dark:bg-slate-900 p-6 sm:p-7 shadow-2xl border border-slate-100 dark:border-slate-800">
                         <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
                             <h3 className="text-lg font-bold text-slate-900 dark:text-white">Detail Log Keamanan</h3>
                             <button
@@ -308,14 +308,14 @@ export default function Index({ logs, filters }: Props) {
                             </div>
                             <div className="py-1.5 border-b border-slate-100 dark:border-slate-800">
                                 <span className="text-slate-500 dark:text-slate-400 font-medium block mb-1">User Agent</span>
-                                <span className="text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl p-3 block break-all text-xs leading-relaxed">
+                                <span className="text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-lg p-3 block break-all text-xs leading-relaxed">
                                     {detailLog.user_agent || '-'}
                                 </span>
                             </div>
                             {detailLog.message && (
                                 <div className="py-1.5">
                                     <span className="text-slate-500 dark:text-slate-400 font-medium block mb-1">Pesan</span>
-                                    <span className="text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl p-3 block text-xs leading-relaxed">
+                                    <span className="text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-lg p-3 block text-xs leading-relaxed">
                                         {detailLog.message}
                                     </span>
                                 </div>
@@ -326,7 +326,7 @@ export default function Index({ logs, filters }: Props) {
                             <button
                                 type="button"
                                 onClick={() => setDetailLog(null)}
-                                className="rounded-xl bg-slate-100 dark:bg-slate-800 px-5 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                                className="rounded-lg bg-slate-100 dark:bg-slate-800 px-5 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition"
                             >
                                 Tutup
                             </button>

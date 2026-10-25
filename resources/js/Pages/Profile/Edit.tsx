@@ -17,7 +17,7 @@ export default function Edit({
             <Head title="Profil" />
 
             <div className="space-y-6">
-                <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+                <div className="rounded-lg border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
                     <div className="space-y-1">
                         <nav className="flex items-center gap-1.5 text-xs">
                             <Link
@@ -39,19 +39,19 @@ export default function Edit({
                 </div>
 
                 <div className="space-y-6 max-w-4xl">
-                    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+                    <div className="rounded-lg border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 sm:p-7 shadow-sm">
                         <UpdateProfileInformationForm
                             mustVerifyEmail={mustVerifyEmail}
                             status={status}
                         />
                     </div>
 
-                    <div className="rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
+                    <div className="rounded-lg border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
                         <UpdatePasswordForm />
                     </div>
 
                     {!isSuperAdmin && (
-                        <div className="rounded-2xl border border-rose-200/80 dark:border-rose-950/60 bg-white dark:bg-slate-900 p-6 shadow-sm">
+                        <div className="rounded-lg border border-rose-200/80 dark:border-rose-950/60 bg-white dark:bg-slate-900 p-6 shadow-sm">
                             <DeleteUserForm />
                         </div>
                     )}

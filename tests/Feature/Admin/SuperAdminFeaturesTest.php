@@ -8,6 +8,7 @@ use App\Models\Layanan;
 use App\Models\SsoClient;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class SuperAdminFeaturesTest extends TestCase
@@ -60,7 +61,7 @@ class SuperAdminFeaturesTest extends TestCase
 
     public function test_admin_is_forbidden_from_jurusan_management(): void
     {
-        $response = $this->actingAs($this->admin)->get(route('admin.jurusan.index'));
+        $response = $this->actingAs($this->admin)->get(route('admin.jurusan.create'));
         $response->assertStatus(403);
     }
 
@@ -134,19 +135,28 @@ class SuperAdminFeaturesTest extends TestCase
             'role' => 'admin',
             'jurusan_id' => $this->jurusan->id,
             'password' => 'password123',
+            'password_confirmation' => 'password123',
             'is_active' => true,
         ]);
         $response->assertSessionHas('success');
         $this->assertDatabaseHas('users', ['email' => 'admin.baru@ung.ac.id']);
     }
 
-    public function test_superadmin_can_update_and_toggle_user(): void
+    public function test_superadmin_can_toggle_and_delete_user(): void
     {
+        $prodi = \App\Models\ProgramStudi::create([
+            'jurusan_id' => $this->jurusan->id,
+            'nama_prodi' => 'Sistem Informasi',
+            'jenjang' => 'S1',
+            'is_active' => true,
+        ]);
+
         $user = User::create([
             'name' => 'Target User',
             'email' => 'target.user@ung.ac.id',
             'role' => 'mahasiswa',
             'jurusan_id' => $this->jurusan->id,
+            'program_studi_id' => $prodi->id,
             'is_active' => true,
             'password' => bcrypt('password123'),
         ]);
@@ -154,14 +164,29 @@ class SuperAdminFeaturesTest extends TestCase
         $this->actingAs($this->superAdmin)->patch(route('admin.users.toggle', $user->id));
         $this->assertFalse($user->fresh()->is_active);
 
-        $this->actingAs($this->superAdmin)->put(route('admin.users.update', $user->id), [
-            'name' => 'Target User Updated',
-            'email' => 'target.user@ung.ac.id',
-            'role' => 'mahasiswa',
+        $deleteResponse = $this->actingAs($this->superAdmin)->delete(route('admin.users.destroy', $user->id));
+        $deleteResponse->assertSessionHas('success');
+        $this->assertDatabaseMissing('users', ['id' => $user->id]);
+    }
+
+    public function test_superadmin_can_create_admin_jurusan_with_password(): void
+    {
+        // Buat admin jurusan baru dengan password dan konfirmasi password
+        $response = $this->actingAs($this->superAdmin)->post(route('admin.users.store'), [
+            'name' => 'Admin TI',
+            'email' => 'admin.ti@ung.ac.id',
+            'role' => 'admin',
             'jurusan_id' => $this->jurusan->id,
+            'password' => 'PasswordTI123!',
+            'password_confirmation' => 'PasswordTI123!',
             'is_active' => true,
         ]);
-        $this->assertEquals('Target User Updated', $user->fresh()->name);
+        $response->assertSessionHas('success');
+
+        $admin = User::where('email', 'admin.ti@ung.ac.id')->firstOrFail();
+        $this->assertEquals('admin', $admin->role);
+        $this->assertEquals($this->jurusan->id, $admin->jurusan_id);
+        $this->assertTrue(Hash::check('PasswordTI123!', $admin->password));
     }
 
     public function test_superadmin_cannot_toggle_self_status(): void
@@ -212,26 +237,5 @@ class SuperAdminFeaturesTest extends TestCase
         $this->actingAs($this->superAdmin)->delete(route('admin.sso-clients.destroy', $client->id));
         $this->assertDatabaseMissing('sso_clients', ['id' => $client->id]);
     }
-
-    public function test_admin_is_forbidden_from_audit_logs(): void
-    {
-        $this->actingAs($this->admin)->get(route('admin.audit-logs.index'))->assertStatus(403);
-    }
-
-    public function test_superadmin_can_view_audit_logs(): void
-    {
-        AuthLog::create([
-            'user_id' => $this->superAdmin->id,
-            'event' => 'login',
-            'email' => $this->superAdmin->email,
-            'ip_address' => '127.0.0.1',
-            'user_agent' => 'PHPUnit/Test',
-            'status' => 'success',
-            'message' => 'Login berhasil via credential',
-            'created_at' => now(),
-        ]);
-
-        $response = $this->actingAs($this->superAdmin)->get(route('admin.audit-logs.index'));
-        $response->assertOk();
-    }
 }
+

@@ -7,14 +7,14 @@ interface TableSkeletonProps {
 export default function TableSkeleton({ rows = 5, cols, columns }: TableSkeletonProps) {
     const totalCols = cols ?? columns ?? 5;
     return (
-        <div className="w-full max-w-full rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
+        <div className="w-full max-w-full rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-sm">
             <div className="w-full overflow-x-auto">
                 <table className="w-full min-w-[650px] text-left">
                     <thead className="border-b border-slate-200/80 bg-slate-50/60 dark:border-slate-800 dark:bg-slate-900/40">
                         <tr>
                             {Array.from({ length: totalCols }).map((_, i) => (
                                 <th key={i} className="px-5 py-3.5">
-                                    <div className="skeleton-shimmer h-3.5 w-20 rounded-md" />
+                                    <div className="skeleton-shimmer h-3.5 w-20 rounded-lg" />
                                 </th>
                             ))}
                         </tr>
@@ -25,13 +25,13 @@ export default function TableSkeleton({ rows = 5, cols, columns }: TableSkeleton
                                 {Array.from({ length: totalCols }).map((_, colIdx) => (
                                     <td key={colIdx} className="px-5 py-4">
                                         {colIdx === 0 ? (
-                                            <div className="skeleton-shimmer h-3.5 w-6 rounded-md mx-auto" />
+                                            <div className="skeleton-shimmer h-3.5 w-6 rounded-lg mx-auto" />
                                         ) : colIdx === 1 ? (
                                             <div className="flex items-center gap-3">
                                                 <div className="skeleton-shimmer h-8 w-8 shrink-0 rounded-lg" />
                                                 <div className="space-y-1.5 flex-1">
-                                                    <div className="skeleton-shimmer h-3.5 w-32 rounded-md" />
-                                                    <div className="skeleton-shimmer h-2.5 w-20 rounded-md" />
+                                                    <div className="skeleton-shimmer h-3.5 w-32 rounded-lg" />
+                                                    <div className="skeleton-shimmer h-2.5 w-20 rounded-lg" />
                                                 </div>
                                             </div>
                                         ) : colIdx === totalCols - 1 ? (
@@ -41,7 +41,7 @@ export default function TableSkeleton({ rows = 5, cols, columns }: TableSkeleton
                                             </div>
                                         ) : (
                                             <div
-                                                className={`skeleton-shimmer h-3.5 rounded-md ${
+                                                className={`skeleton-shimmer h-3.5 rounded-lg ${
                                                     colIdx % 2 === 0 ? 'w-24' : 'w-16'
                                                 }`}
                                             />

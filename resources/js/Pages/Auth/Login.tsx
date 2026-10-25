@@ -4,7 +4,7 @@ import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler, useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, LogIn } from 'lucide-react';
 
 export default function Login({
     status,
@@ -37,7 +37,7 @@ export default function Login({
             </div>
 
             {status && (
-                <div className="mb-5 rounded border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-2 text-xs text-emerald-800 dark:text-emerald-300">
+                <div className="mb-5 rounded-lg border border-emerald-200 dark:border-emerald-800/60 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-2 text-xs text-emerald-800 dark:text-emerald-300">
                     {status}
                 </div>
             )}
@@ -46,7 +46,7 @@ export default function Login({
                 href={route('auth.google.redirect')}
                 id="btn-google-login"
                 onClick={() => setIsGoogleLoading(true)}
-                className="flex w-full items-center justify-center gap-2.5 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-200 shadow-sm transition hover:border-ung-maroon hover:text-ung-maroon dark:hover:bg-slate-700 active:bg-ung-maroon-50/50 focus:outline-none focus:ring-2 focus:ring-ung-maroon focus:ring-offset-2"
+                className="flex w-full items-center justify-center gap-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 text-sm font-medium text-slate-700 dark:text-slate-200 shadow-sm transition hover:border-ung-maroon hover:text-ung-maroon dark:hover:bg-slate-700 active:bg-ung-maroon-50/50 focus:outline-none focus:ring-2 focus:ring-ung-maroon focus:ring-offset-2"
             >
                 {isGoogleLoading ? (
                     <>
@@ -74,7 +74,7 @@ export default function Login({
 
             <form onSubmit={submit} className="space-y-4" noValidate>
                 <div>
-                    <InputLabel htmlFor="email" value="Email Administrator" className="text-xs font-medium text-slate-700 dark:text-slate-300" />
+                    <InputLabel htmlFor="email" value="Email Administrator" required className="text-xs font-medium text-slate-700 dark:text-slate-300" />
                     <TextInput
                         id="email"
                         type="email"
@@ -89,7 +89,7 @@ export default function Login({
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="password" value="Password" className="text-xs font-medium text-slate-700 dark:text-slate-300" />
+                    <InputLabel htmlFor="password" value="Password" required className="text-xs font-medium text-slate-700 dark:text-slate-300" />
                     <TextInput
                         id="password"
                         type="password"
@@ -106,8 +106,8 @@ export default function Login({
                 <button
                     type="submit"
                     id="btn-admin-login"
-                    disabled={processing}
-                    className="flex w-full items-center justify-center gap-2 rounded-md bg-ung-maroon py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-ung-maroon-700 active:bg-ung-maroon-800 focus:outline-none focus:ring-2 focus:ring-ung-maroon focus:ring-offset-2 disabled:opacity-50"
+                    disabled={!data.email.trim() || !data.password || processing}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-ung-maroon py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-ung-maroon-700 active:bg-ung-maroon-800 focus:outline-none focus:ring-2 focus:ring-ung-maroon focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {processing ? (
                         <>
@@ -115,7 +115,10 @@ export default function Login({
                             <span>Memverifikasi...</span>
                         </>
                     ) : (
-                        'Login sebagai Administrator'
+                        <>
+                            <LogIn className="h-4 w-4" />
+                            <span>Login sebagai Administrator</span>
+                        </>
                     )}
                 </button>
             </form>

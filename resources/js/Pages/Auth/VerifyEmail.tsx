@@ -22,7 +22,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
             </div>
 
             {status === 'verification-link-sent' && (
-                <div className="mb-5 rounded border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
+                <div className="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-800">
                     Tautan verifikasi baru telah dikirimkan ke alamat email Anda.
                 </div>
             )}
@@ -32,7 +32,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
                     type="submit"
                     id="btn-resend-verification"
                     disabled={processing}
-                    className="w-full rounded-md bg-ung-maroon py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-ung-maroon-700 focus:outline-none focus:ring-2 focus:ring-ung-maroon focus:ring-offset-2 disabled:opacity-50"
+                    className="w-full rounded-lg bg-ung-maroon py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-ung-maroon-700 focus:outline-none focus:ring-2 focus:ring-ung-maroon focus:ring-offset-2 disabled:opacity-50"
                 >
                     {processing ? 'Mengirim ulang...' : 'Kirim Ulang Tautan Verifikasi'}
                 </button>

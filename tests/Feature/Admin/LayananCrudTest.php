@@ -151,6 +151,36 @@ class LayananCrudTest extends TestCase
         ]);
     }
 
+    public function test_superadmin_can_update_layanan(): void
+    {
+        $layanan = Layanan::create([
+            'jurusan_id' => $this->jurusanInformatika->id,
+            'nama_layanan' => 'Layanan Lama Superadmin',
+            'slug' => 'layanan-lama-superadmin',
+            'url' => 'https://ung.ac.id/old',
+            'tipe_integrasi' => 'link_eksternal',
+            'is_active' => true,
+            'urutan' => 1,
+        ]);
+
+        $response = $this->actingAs($this->superAdmin)->put(route('admin.layanan.update', $layanan), [
+            'nama_layanan' => 'Layanan Baru Superadmin',
+            'slug' => 'layanan-baru-superadmin',
+            'url' => 'https://ung.ac.id/new',
+            'tipe_integrasi' => 'link_eksternal',
+            'is_active' => true,
+            'urutan' => 2,
+        ]);
+
+        $response->assertRedirect(route('admin.layanan.index'));
+        $this->assertDatabaseHas('layanan', [
+            'id' => $layanan->id,
+            'nama_layanan' => 'Layanan Baru Superadmin',
+            'jurusan_id' => $this->jurusanInformatika->id,
+            'urutan' => 2,
+        ]);
+    }
+
     public function test_admin_can_toggle_layanan_status(): void
     {
         $layanan = Layanan::create([

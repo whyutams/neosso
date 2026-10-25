@@ -99,6 +99,17 @@ class GoogleAuthController extends Controller
         Auth::login($user, true);
         request()->session()->regenerate();
 
+        \App\Models\AuthLog::create([
+            'user_id' => $user->id,
+            'event' => 'login',
+            'email' => $user->email,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'status' => 'success',
+            'message' => 'Login berhasil via Google SSO',
+            'created_at' => now(),
+        ]);
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 }
