@@ -17,19 +17,19 @@ class SecurityHeadersMiddleware
     {
         $response = $next($request);
 
-        // Prevent clickjacking by disallowing framing from other domains
+        // Proteksi clickjacking
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
 
-        // Prevent browsers from MIME-sniffing a response away from declared content-type
+        // Cegah MIME-sniffing
         $response->headers->set('X-Content-Type-Options', 'nosniff');
 
-        // Protect URL referer leakage across origins
+        // Kebijakan referrer
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-        // Restrict unnecessary browser hardware features for SSO
+        // Batasi fitur hardware browser
         $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
-        // Enforce HTTPS via HSTS for 1 year in production
+        // Enforce HSTS di production
         if (app()->environment('production')) {
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
         }

@@ -1,4 +1,6 @@
+import ThemeToggle from '@/Components/ThemeToggle';
 import { Link } from '@inertiajs/react';
+import { Home } from 'lucide-react';
 import { PropsWithChildren } from 'react';
 
 interface GuestLayoutProps extends PropsWithChildren {
@@ -7,7 +9,7 @@ interface GuestLayoutProps extends PropsWithChildren {
 
 export default function GuestLayout({ children, showHomeButton = true }: GuestLayoutProps) {
     return (
-        <div className="flex min-h-screen w-full bg-white text-slate-900">
+        <div className="flex min-h-screen w-full bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100">
             <div className="relative hidden flex-1 flex-col justify-between overflow-hidden bg-ung-maroon p-10 text-white lg:flex xl:p-14 2xl:p-16">
                 <div className="absolute inset-0 z-0 select-none">
                     <img
@@ -51,27 +53,17 @@ export default function GuestLayout({ children, showHomeButton = true }: GuestLa
                 </div>
             </div>
 
-            <div className="relative flex w-full flex-col justify-center overflow-hidden bg-white lg:w-[480px] xl:w-[540px] 2xl:w-[580px] lg:shrink-0 border-l border-slate-100">
+            <div className="relative flex w-full flex-col justify-center overflow-hidden bg-white dark:bg-slate-900 lg:w-[480px] xl:w-[540px] 2xl:w-[580px] lg:shrink-0 border-l border-slate-100 dark:border-slate-800">
+                <div className="absolute top-5 right-5 z-20 sm:top-6 sm:right-6 lg:top-8 lg:right-8">
+                    <ThemeToggle />
+                </div>
                 {showHomeButton && (
                     <div className="absolute top-5 left-5 z-20 sm:top-6 sm:left-6 lg:top-8 lg:left-8">
                         <Link
                             href="/"
-                            className="group inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-ung-maroon hover:text-ung-maroon hover:bg-ung-maroon-50/50 active:bg-ung-maroon-100/60 focus:outline-none focus:ring-2 focus:ring-ung-maroon focus:ring-offset-2"
+                            className="group inline-flex h-10 items-center gap-2 rounded-xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 px-3.5 text-xs font-semibold text-slate-600 dark:text-slate-300 shadow-xs transition-colors duration-200 ease-in-out hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-[#9e1a1a] dark:hover:text-rose-400 focus:outline-none focus:ring-2 focus:ring-[#9e1a1a]/20 dark:focus:ring-rose-500/30"
                         >
-                            <svg
-                                className="h-3.5 w-3.5 text-slate-500 transition-colors group-hover:text-ung-maroon group-active:text-ung-maroon"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth="2"
-                                stroke="currentColor"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
-                                />
-                            </svg>
+                            <Home className="h-4 w-4 text-slate-400 group-hover:text-[#9e1a1a] dark:text-slate-500 dark:group-hover:text-rose-400 transition-colors shrink-0" />
                             <span>Beranda</span>
                         </Link>
                     </div>

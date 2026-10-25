@@ -26,12 +26,12 @@ class AppServiceProvider extends ServiceProvider
     {
         Vite::prefetch(concurrency: 3);
 
-        // Force HTTPS in production
+        // Paksa HTTPS di production
         if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
 
-        // Configure default password policy globally
+        // Kebijakan password default
         Password::defaults(function () {
             $rule = Password::min(12);
 
@@ -40,7 +40,7 @@ class AppServiceProvider extends ServiceProvider
                 : $rule->letters()->numbers();
         });
 
-        // Register authentication audit logging subscriber
+        // Listener log autentikasi
         Event::subscribe(LogAuthenticationEvents::class);
     }
 }

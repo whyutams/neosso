@@ -42,6 +42,11 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+        // Super Admin dilarang menghapus akun sendiri
+        if ($user->role === 'superadmin') {
+            return back()->with('error', 'Akun Super Admin tidak dapat dihapus.');
+        }
+
         Auth::logout();
 
         $user->delete();

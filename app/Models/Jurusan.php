@@ -10,15 +10,10 @@ class Jurusan extends Model
 {
     use HasFactory;
 
-    /**
-     * Nama tabel di database.
-     *
-     * @var string
-     */
     protected $table = 'jurusan';
 
     /**
-     * Atribut yang dapat diisi secara massal.
+     * The attributes that are mass assignable.
      *
      * @var list<string>
      */
@@ -28,7 +23,7 @@ class Jurusan extends Model
     ];
 
     /**
-     * Konversi tipe data atribut.
+     * The attributes that should be cast.
      *
      * @return array<string, string>
      */
@@ -39,27 +34,33 @@ class Jurusan extends Model
         ];
     }
 
-    /**
-     * Seluruh pengguna (admin dan mahasiswa) yang bernaung di bawah jurusan ini.
-     */
+    // Relasi user di jurusan ini
     public function users(): HasMany
     {
         return $this->hasMany(User::class, 'jurusan_id');
     }
 
-    /**
-     * Seluruh administrator yang mengelola jurusan ini.
-     */
+    // Relasi admin jurusan
     public function admins(): HasMany
     {
         return $this->hasMany(User::class, 'jurusan_id')->where('role', 'admin');
     }
 
-    /**
-     * Seluruh mahasiswa di bawah jurusan ini.
-     */
+    // Relasi mahasiswa jurusan
     public function mahasiswa(): HasMany
     {
         return $this->hasMany(User::class, 'jurusan_id')->where('role', 'mahasiswa');
+    }
+
+    // Relasi layanan milik jurusan
+    public function layanan(): HasMany
+    {
+        return $this->hasMany(Layanan::class, 'jurusan_id');
+    }
+
+    // Relasi program studi di jurusan ini
+    public function programStudi(): HasMany
+    {
+        return $this->hasMany(ProgramStudi::class, 'jurusan_id');
     }
 }

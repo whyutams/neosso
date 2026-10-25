@@ -10,15 +10,14 @@ use Illuminate\Support\Facades\Hash;
 class AdminUserSeeder extends Seeder
 {
     /**
-     * Jalankan seeder database.
+     * Run the database seeds.
      */
     public function run(): void
     {
-        // 1. Akun Superadmin (Tingkat Sistem / Universitas)
         User::firstOrCreate(
             ['email' => 'superadmin@ung.ac.id'],
             [
-                'name' => 'Super Administrator',
+                'name' => 'Super Admin',
                 'jurusan_id' => null,
                 'google_id' => null,
                 'avatar' => null,
@@ -31,7 +30,6 @@ class AdminUserSeeder extends Seeder
             ]
         );
 
-        // 2. Akun Admin Jurusan Informatika
         $jurusanInformatika = Jurusan::where('nama_jurusan', 'Informatika')->first();
 
         if ($jurusanInformatika) {

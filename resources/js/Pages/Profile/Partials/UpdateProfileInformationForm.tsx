@@ -1,10 +1,10 @@
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
-import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Transition } from '@headlessui/react';
 import { Link, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
+import { Loader2, Check } from 'lucide-react';
 
 export default function UpdateProfileInformation({
     mustVerifyEmail,
@@ -25,80 +25,86 @@ export default function UpdateProfileInformation({
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-
         patch(route('profile.update'));
     };
 
     return (
         <section className={className}>
-            <header>
-                <h2 className="text-lg font-medium text-gray-900">
-                    Profile Information
+            <header className="border-b border-slate-100 dark:border-slate-800 pb-3">
+                <h2 className="text-sm font-bold text-slate-800 dark:text-white">
+                    Informasi Profil
                 </h2>
-
-                <p className="mt-1 text-sm text-gray-600">
-                    Update your account's profile information and email address.
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                    Perbarui nama dan alamat email akun Anda.
                 </p>
             </header>
 
-            <form onSubmit={submit} className="mt-6 space-y-6">
+            <form onSubmit={submit} className="mt-5 space-y-4 max-w-xl">
                 <div>
-                    <InputLabel htmlFor="name" value="Name" />
-
+                    <InputLabel htmlFor="name" value="Nama" className="text-xs font-semibold text-slate-700 dark:text-slate-300" />
                     <TextInput
                         id="name"
-                        className="mt-1 block w-full"
+                        className="mt-1.5 block w-full rounded-lg text-xs"
                         value={data.name}
                         onChange={(e) => setData('name', e.target.value)}
+                        placeholder="Nama Anda"
                         required
                         isFocused
                         autoComplete="name"
                     />
-
-                    <InputError className="mt-2" message={errors.name} />
+                    <InputError className="mt-1.5 text-xs text-rose-600 dark:text-rose-400" message={errors.name} />
                 </div>
 
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
-
+                    <InputLabel htmlFor="email" value="Email" className="text-xs font-semibold text-slate-700 dark:text-slate-300" />
                     <TextInput
                         id="email"
                         type="email"
-                        className="mt-1 block w-full"
+                        className="mt-1.5 block w-full rounded-lg text-xs"
                         value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
+                        placeholder="Alamat email Anda"
                         required
                         autoComplete="username"
                     />
-
-                    <InputError className="mt-2" message={errors.email} />
+                    <InputError className="mt-1.5 text-xs text-rose-600 dark:text-rose-400" message={errors.email} />
                 </div>
 
                 {mustVerifyEmail && user.email_verified_at === null && (
-                    <div>
-                        <p className="mt-2 text-sm text-gray-800">
-                            Your email address is unverified.
+                    <div className="rounded-lg bg-amber-50 dark:bg-amber-950/40 p-3 text-xs text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60">
+                        <p>
+                            Alamat email Anda belum diverifikasi.{' '}
                             <Link
                                 href={route('verification.send')}
                                 method="post"
                                 as="button"
-                                className="rounded-md text-sm text-slate-600 underline hover:text-ung-maroon focus:outline-none focus:ring-2 focus:ring-ung-maroon focus:ring-offset-2"
+                                className="font-semibold underline hover:text-[#9e1a1a]"
                             >
-                                Click here to re-send the verification email.
+                                Klik di sini untuk mengirim ulang email verifikasi.
                             </Link>
                         </p>
 
                         {status === 'verification-link-sent' && (
-                            <div className="mt-2 text-sm font-medium text-green-600">
-                                A new verification link has been sent to your
-                                email address.
-                            </div>
+                            <p className="mt-1.5 font-medium text-emerald-700 dark:text-emerald-400">
+                                Tautan verifikasi baru telah dikirim ke alamat email Anda.
+                            </p>
                         )}
                     </div>
                 )}
 
-                <div className="flex items-center gap-4">
-                    <PrimaryButton disabled={processing}>Save</PrimaryButton>
+                <div className="flex items-center gap-3 pt-2">
+                    <button
+                        type="submit"
+                        disabled={processing}
+                        className="inline-flex items-center gap-1.5 rounded-lg bg-[#9e1a1a] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#831414] disabled:opacity-50"
+                    >
+                        {processing ? (
+                            <Loader2 className="h-4 w-4 animate-spin text-white" />
+                        ) : (
+                            <Check className="h-4 w-4" />
+                        )}
+                        <span>{processing ? 'Menyimpan...' : 'Simpan'}</span>
+                    </button>
 
                     <Transition
                         show={recentlySuccessful}
@@ -107,8 +113,8 @@ export default function UpdateProfileInformation({
                         leave="transition ease-in-out"
                         leaveTo="opacity-0"
                     >
-                        <p className="text-sm text-gray-600">
-                            Saved.
+                        <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">
+                            Tersimpan.
                         </p>
                     </Transition>
                 </div>

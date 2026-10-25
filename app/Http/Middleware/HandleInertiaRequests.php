@@ -34,6 +34,17 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'flash' => [
+                'success' => fn () => $request->session()->get('success'),
+                'error' => fn () => $request->session()->get('error'),
+            ],
+            'tautanLayanan' => fn () => $request->user()
+                ? \App\Models\Layanan::where('is_active', true)
+                    ->orderBy('urutan', 'asc')
+                    ->orderBy('id', 'asc')
+                    ->select('id', 'nama_layanan', 'url', 'tipe_integrasi')
+                    ->get()
+                : [],
         ];
     }
 }

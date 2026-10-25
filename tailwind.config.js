@@ -15,16 +15,16 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Noto Sans', ...defaultTheme.fontFamily.sans],
             },
             colors: {
                 'ung-maroon': {
-                    DEFAULT: '#7B1113',
+                    DEFAULT: '#9e1a1a',
                     50: '#FDF6F6',
                     100: '#F9E8E9',
-                    600: '#9C171A',
-                    700: '#8B1416',
-                    800: '#7B1113',
+                    600: '#b91c1c',
+                    700: '#831414',
+                    800: '#9e1a1a',
                     900: '#4A0708',
                     950: '#2D0405',
                 },
