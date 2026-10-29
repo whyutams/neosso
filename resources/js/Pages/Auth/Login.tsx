@@ -32,7 +32,7 @@ export default function Login({
             <div className="mb-7">
                 <h1 className="text-xl font-bold text-slate-800 dark:text-white">Login ke Portal</h1>
                 <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                    Gunakan akun Google Universitas Negeri Gorontalo untuk login.
+                    Mahasiswa dapat masuk atau daftar otomatis dengan Akun Google UNG.
                 </p>
             </div>
 

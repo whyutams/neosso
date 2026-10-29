@@ -49,7 +49,6 @@ export default function UpdateProfileInformation({
                         onChange={(e) => setData('name', e.target.value)}
                         placeholder="Nama Anda"
                         required
-                        isFocused
                         autoComplete="name"
                     />
                     <InputError className="mt-1 text-xs text-rose-600 dark:text-rose-400" message={errors.name} />
